@@ -4,38 +4,52 @@
 .idea
 
 # Because this really is a working directory, ignore vagrant's files
-/.vagrant
+/aws/.vagrant
+/local/.vagrant
 
 # This is a file intended for hooking in a custom Vagrant configuration on up
-/Customfile
+/aws/Customfile
+/local/Customfile
 
 # Allow for custom provisioning scripts that are not included with the repo
-/provision/provision-custom.sh
-/provision/provision-pre.sh
-/provision/provision-post.sh
+/aws/provision/provision-custom.sh
+/aws/provision/provision-pre.sh
+/aws/provision/provision-post.sh
+/local/provision/provision-custom.sh
+/local/provision/provision-pre.sh
+/local/provision/provision-post.sh
 
 # Ignore custom trigger scripts in config/homebin.
-/config/homebin/vagrant_halt_custom
-/config/homebin/vagrant_suspend_custom
-/config/homebin/vagrant_destroy_custom
+/aws/config/homebin/vagrant_halt_custom
+/aws/config/homebin/vagrant_suspend_custom
+/aws/config/homebin/vagrant_destroy_custom
+/local/config/homebin/vagrant_halt_custom
+/local/config/homebin/vagrant_suspend_custom
+/local/config/homebin/vagrant_destroy_custom
 
 # No need to share individual site configs with each other
-/config/nginx-config/sites/*.conf
+/aws/config/nginx-config/sites/*.conf
+/local/config/nginx-config/sites/*.conf
 
 # Ignore anything in the 'custom' directory in config
-/config/custom/*
+/aws/config/custom/*
+/local/config/custom/*
 
 # Ignore a custom bash_prompt if it exists
-/config/bash_prompt
+/aws/config/bash_prompt
+/local/config/bash_prompt
 
 # No need to share our mysql data with each other
-/database/data/*
+/aws/database/data/*
+/local/database/data/*
 
 # Log files should be ignored.
-/log/*.log
+/aws/log/*.log
+/local/log/*.log
 
 # No need to share our individual sites with each other
-/www/*
+/aws/www/*
+/local/www/*
 
 # And no need to share individual SQL files with each other
 *.sql
@@ -44,14 +58,19 @@
 # BUT....
 
 # We do have some default nginx configs that should be included
+!/aws/config/nginx-config/sites/default.conf
 !/config/nginx-config/sites/default.conf
 
 # And we do have a default SQL file that should be included
-!/database/init.sql
+!/aws/database/init.sql
+!/local/database/init.sql
 
 # And we provide our default host names in a dat file.
-!/www/vvv-hosts
+!/aws/www/vvv-hosts
+!/local/www/vvv-hosts
 
 # And a few of our web directories are important to share.
-/www/default/*
-!/www/default/index.php
+/aws/www/default/*
+!/aws/www/default/index.php
+/local/www/default/*
+!/local/www/default/index.php
