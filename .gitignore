@@ -69,8 +69,6 @@
 !/aws/www/vvv-hosts
 !/local/www/vvv-hosts
 
-# And a few of our web directories are important to share.
-/aws/www/default/*
-!/aws/www/default/index.php
-/local/www/default/*
-!/local/www/default/index.php
+# Do not ignore default folder
+!/aws/www/default/
+!/local/www/default/
