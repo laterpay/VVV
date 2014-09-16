@@ -59,7 +59,7 @@
 
 # We do have some default nginx configs that should be included
 !/aws/config/nginx-config/sites/default.conf
-!/config/nginx-config/sites/default.conf
+!/local/config/nginx-config/sites/default.conf
 
 # And we do have a default SQL file that should be included
 !/aws/database/init.sql
