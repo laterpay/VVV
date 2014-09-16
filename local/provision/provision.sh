@@ -78,6 +78,7 @@ apt_package_check_list=(
 	vim
 	colordiff
 	postfix
+	mc
 
 	# Req'd for i18n tools
 	gettext
@@ -198,13 +199,25 @@ if [[ $ping_result == *bytes?from* ]]; then
 		chmod +x composer.phar
 		mv composer.phar /usr/local/bin/composer
 
-		COMPOSER_HOME=/usr/local/src/composer composer -q global require --no-update phpunit/phpunit:4.0.*
-		COMPOSER_HOME=/usr/local/src/composer composer -q global require --no-update phpunit/php-invoker:1.1.*
-		COMPOSER_HOME=/usr/local/src/composer composer -q global require --no-update mockery/mockery:0.8.*
+		COMPOSER_HOME=/usr/local/src/composer composer -q global require --no-update phpunit/phpunit:*
+		COMPOSER_HOME=/usr/local/src/composer composer -q global require --no-update phpunit/php-invoker:*
+		COMPOSER_HOME=/usr/local/src/composer composer -q global require --no-update phpunit/phpunit-selenium:*
+		COMPOSER_HOME=/usr/local/src/composer composer -q global require --no-update phpunit/phpunit-story:*
+		COMPOSER_HOME=/usr/local/src/composer composer -q global require --no-update phpunit/dbunit:*
+		COMPOSER_HOME=/usr/local/src/composer composer -q global require --no-update mockery/mockery:*
 		COMPOSER_HOME=/usr/local/src/composer composer -q global require --no-update d11wtq/boris:v1.0.2
 		COMPOSER_HOME=/usr/local/src/composer composer -q global config bin-dir /usr/local/bin
 		COMPOSER_HOME=/usr/local/src/composer composer global update
 	fi
+
+    #install java
+    echo "Install Java"
+    apt-get install java-common
+    apt-get -y install default-jre
+
+	#install and start selenium standalone server
+	echo "Install standalone selenium server"
+	npm install --production selenium-standalone@latest -g
 
 	# Grunt
 	#
@@ -385,6 +398,17 @@ if [[ $ping_result == *bytes?from* ]]; then
 	# Link `wp` to the `/usr/local/bin` directory
 	ln -sf /srv/www/wp-cli/bin/wp /usr/local/bin/wp
 
+	# Laterpay Plugin Install
+	if [[ ! -d /srv/wordpress-plugin/laterpay-plugin/laterpay/ ]]; then
+		echo -e "\nDownloading Laterpay Plugin..."
+		#here we need correct ssh key
+		git clone https://github.com/laterpay/laterpay-wordpress-plugin.git /srv/wordpress-plugin/laterpay-plugin/
+	else
+		echo -e "\nUpdating Laterpay Plugin..."
+		cd /srv/wordpress-plugin/
+		git pull --rebase origin master
+	fi
+
 	# Download and extract phpMemcachedAdmin to provide a dashboard view and
 	# admin interface to the goings on of memcached when running
 	if [[ ! -d /srv/www/default/memcached-admin ]]; then
@@ -466,10 +490,13 @@ if [[ $ping_result == *bytes?from* ]]; then
 define( 'WP_DEBUG', true );
 PHP
 		wp core install --url=local.wordpress.dev --quiet --title="Local WordPress Dev" --admin_name=admin --admin_email="admin@local.dev" --admin_password="password"
+		cp -r /srv/wordpress-plugin/laterpay-plugin/laterpay/ /srv/www/wordpress-default/wp-content/plugins/
+		wp plugin activate laterpay
 	else
 		echo "Updating WordPress Stable..."
 		cd /srv/www/wordpress-default
-		wp core upgrade
+		wp core update
+		cp -r /srv/wordpress-plugin/laterpay-plugin/laterpay/ /srv/www/wordpress-default/wp-content/plugins/
 	fi
 
 	# Test to see if an svn upgrade is needed
@@ -491,10 +518,13 @@ PHP
 define( 'WP_DEBUG', true );
 PHP
 		wp core install --url=local.wordpress-trunk.dev --quiet --title="Local WordPress Trunk Dev" --admin_name=admin --admin_email="admin@local.dev" --admin_password="password"
+		cp -r /srv/wordpress-plugin/laterpay-plugin/laterpay/ /srv/www/wordpress-trunk/wp-content/plugins/
+		wp plugin activate laterpay
 	else
 		echo "Updating WordPress trunk..."
 		cd /srv/www/wordpress-trunk
 		svn up --ignore-externals
+		cp -r /srv/wordpress-plugin/laterpay-plugin/laterpay/ /srv/www/wordpress-trunk/wp-content/plugins/
 	fi
 
 	# Checkout, install and configure WordPress trunk via develop.svn
@@ -514,6 +544,8 @@ define( 'WP_DEBUG', true );
 PHP
 		wp core install --url=src.wordpress-develop.dev --quiet --title="WordPress Develop" --admin_name=admin --admin_email="admin@local.dev" --admin_password="password"
 		cp /srv/config/wordpress-config/wp-tests-config.php /srv/www/wordpress-develop/
+		cp -r /srv/wordpress-plugin/laterpay-plugin/laterpay/ /srv/www/wordpress-develop/src/wp-content/plugins/
+		wp plugin activate laterpay
 		cd /srv/www/wordpress-develop/
 		npm install &>/dev/null
 	else
@@ -528,6 +560,7 @@ PHP
 				echo "Skip auto git pull on develop.git.wordpress.org since not on master branch"
 			fi
 		fi
+		cp -r /srv/wordpress-plugin/laterpay-plugin/laterpay/ /srv/www/wordpress-develop/src/wp-content/plugins/
 		npm install &>/dev/null
 	fi
 

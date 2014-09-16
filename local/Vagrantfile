@@ -138,6 +138,11 @@ Vagrant.configure("2") do |config|
     config.vm.synced_folder "www/", "/srv/www/", :owner => "www-data", :extra => 'dmode=775,fmode=774'
   end
 
+  # /srv/wordpress-plugin/
+  #
+  # Laterpay plugin folder
+  config.vm.synced_folder "wordpress-plugin/", "/srv/wordpress-plugin/", :owner => "www-data"
+
   # Customfile - POSSIBLY UNSTABLE
   #
   # Use this to insert your own (and possibly rewrite) Vagrant config lines. Helpful
